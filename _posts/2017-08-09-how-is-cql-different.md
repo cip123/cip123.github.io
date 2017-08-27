@@ -36,7 +36,7 @@ Now let's select all AC/DC songs:
 ```sql
 SELECT * FROM songs where artist='AC/DC';
 ```  
-Auch!.This query fails but, at least, it gives us the following message:
+Auch! This query fails but, at least, it gives us the following message:
 
 <span style="color:red">If you want to execute this query despite the performance unpredictability, use ALLOW FILTERING</span>
 
@@ -198,7 +198,7 @@ Fortunately, Cassandra ships with a nice utility called `SSTablesDump` which let
 ]
 ```
 
-That was it, thanks for reading so far, you can always reach me for questions, comments.
+That was it, thanks for reading so far, you can always reach me for questions and feedback.
 
 
 
