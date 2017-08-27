@@ -81,7 +81,7 @@ Here how the same 4 records are stored with this new layout.
 ![cassandra-nodes-with-duplicate-primary-key](/assets/img/cassandra-nodes-primary-key-not-unique.png){:class="img-responsive"}
 
 
- Like we expected, we have only one Motörhead song. But the nice value is we can do queries like:
+ Like we expected, we have only one Motörhead song. But, now at least, we can do queries like:
 
 ```sql
 SELECT * FROM songs where artist='AC/DC';
