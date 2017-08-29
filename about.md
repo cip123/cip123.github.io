@@ -4,7 +4,10 @@ title: About
 permalink: /about/
 ---
 
-Consultant experienced in both entrepreneurship and programming. Specialized in Java, Scala and Ruby on Rails.
+Consultant who specializes in Java, Scala and Ruby on Rails. I will be glad to help you. 
 
+You can contact me at:  
 
-Please contact me at: {{ site.email }}
+**{{ site.email }}**
+
+**+40 0744 448853**
