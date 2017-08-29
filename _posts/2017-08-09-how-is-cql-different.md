@@ -80,7 +80,7 @@ CREATE TABLE songs(
  );
 ```
 
-Here how the same 4 records are stored with this new layout. 
+Here is how the same 4 records are stored with this new layout. 
 
 ![cassandra-nodes-with-duplicate-primary-key](/assets/img/cassandra-nodes-primary-key-not-unique.png){:class="img-responsive"}
 
@@ -100,7 +100,7 @@ SELECT * FROM songs where artist='AC/DC' AND album='T.N.T';
 The bad news is that we have only one Motörhead record, because the two songs share the same album. 
 
 
-So, the trick is that if you are going to filter data, you should always specify the partioning key (or keys, you can have a composite partitioning key) so that Cassandra will know which node to talk to. Then, if you want, you can add some clustering keys to the where clause.
+So, the trick is that if you are going to filter data, you should always specify the partioning key (or keys, you can have a composite partitioning key) so that Cassandra will know which node to talk to. Then, if you need to, you can add some clustering keys to the where clause.
 
 
 #### Composite clustering key
