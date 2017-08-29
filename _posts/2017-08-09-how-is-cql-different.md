@@ -60,9 +60,13 @@ There is one problem though, if we use just the `artist` as the primary key, som
 
 The primary key syntax in Cassandra is special. The first position of the primary key is the `partition key` which is used to select the cassandra node. The rest of the elements comprise the `clustering key`. 
 
-#### Simple clustering key
+You can think of the clustering key as the primary key inside the partition. 
 
-Let's try to use both `artist` and `album` as the primary key. It is still not a good solution since Motörhead songs are on the same album but it will help us exemplify the way records are stored.
+
+
+#### Simple clustering key
+Let's exemplify with `artist` at the partitioning key and `album` as the clustering key.
+
 
 ```sql
 CREATE TABLE songs(
@@ -80,8 +84,7 @@ Here how the same 4 records are stored with this new layout.
 
 ![cassandra-nodes-with-duplicate-primary-key](/assets/img/cassandra-nodes-primary-key-not-unique.png){:class="img-responsive"}
 
-
- Like we expected, we have only one Motörhead song. But, now at least, we can do queries like:
+The good news is that now we can do queries like:
 
 ```sql
 SELECT * FROM songs where artist='AC/DC';
@@ -94,13 +97,17 @@ and even:
 SELECT * FROM songs where artist='AC/DC' AND album='T.N.T';
 ```  
 
-So, the trick is that if you are going to filter data, you should always specify the partioning key (or keys, you can have a composite partitioning key) and then the clustering key. 
+The bad news is that we have only one Motörhead record, because the two songs share the same album. 
+
+
+So, the trick is that if you are going to filter data, you should always specify the partioning key (or keys, you can have a composite partitioning key) so that Cassandra will know which node to talk to. Then, if you want, you can add some clustering keys to the where clause.
+
 
 #### Composite clustering key
 
 Let's wrap this up with the final example which will hopefully help the CQL model to sink in. 
 
-As you may have noticed, we could use the track number along with the album name to uniquely identify a song. We can use a composite clustering key.
+As you may have noticed, we could use the `track_number` along with the `album` to uniquely identify a song. We can use then a composite clustering key.
 
 ```sql
 CREATE TABLE songs(
@@ -122,9 +129,11 @@ So inserting the same 4 records will be distributed like this.
 Now, we can do all the previous queries + one. 
 
 ```sql
+SELECT * FROM songs where artist='AC/DC';
+SELECT * FROM songs where artist='AC/DC' AND album='T.N.T';
 SELECT * FROM songs where artist='AC/DC' AND album='T.N.T' AND track_number=1;
 ```  
-Every key that we add to the clustering key can be added to the `WHERE` clause, but you have to make sure you specified all the clustering keys that were declare before it.
+Every key that we add to the clustering key can be added to the `WHERE` clause, but you have to make sure you specified all the clustering keys that were declared before it.
 
 
 ### The actual files 
