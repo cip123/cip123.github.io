@@ -312,3 +312,28 @@ for (int i = start + 1; i <= s.length(); i++) {
     }
 }
 ```            
+
+## 399. Evaluate Division
+
+Equations are given in the format A / B = k, where A and B are variables represented as strings, and k is a real number (floating point number). Given some queries, return the answers. If the answer does not exist, return -1.0.
+
+    Example:
+    Given a / b = 2.0, b / c = 3.0.
+    queries are: a / c = ?, b / a = ?, a / e = ?, a / a = ?, x / x = ? .
+    return [6.0, 0.5, -1.0, 1.0, -1.0 ].
+
+*Solution* 
+
+We need to find a link between a and c. The link can be in form `a/b` or  b/a. So it would be easier to canonize it somehow, sorting them so the first letter is always smaller.
+
+So we would have `a/b, b/c, c/d` If we would like to find `a\d` we navigate from `a` until we reach `d` and we keep the product. We could even cache, each product for example `a/c = 6` so we would have reuse it if needed. 
+
+### How would we cache it ? 
+We can't use a map with a `a/c` key because we would like to iterate all the elements that start with `a`.
+
+So it's better to use a two dimensional array.
+
+ON the other hand there is a hint in the problem's body that suggests constructin the cache first. In fact this seems very intuitive. 
+
+
+
