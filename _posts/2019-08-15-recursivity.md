@@ -535,5 +535,5 @@ At the first position. We can only buy. Second position we can either buy, sell 
  `sold[i] = Math.max(sold[i-1], bought[i-1] + price[i])`
 
              1  2  3  0  2
-    bought: -1 -1 -1  2  0
-    sold:    0  1  2  2  4
+    bought: -1 -1 -1  1  1
+    sold:    0  1  2  2  3
