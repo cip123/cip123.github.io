@@ -337,3 +337,111 @@ ON the other hand there is a hint in the problem's body that suggests constructi
 
 
 
+### 494. Target Sum
+
+ You are given a list of non-negative integers, a1, a2, ..., an, and a target, S. Now you have 2 symbols + and -. For each integer, you should choose one from + and - as its new symbol.
+
+Find out how many ways to assign symbols to make sum of integers equal to target S. 
+
+    Input: nums is [1, 1, 1, 1, 1], S is 3. 
+    Output: 5
+    Explanation: 
+
+    -1+1+1+1+1 = 3
+    +1-1+1+1+1 = 3
+    +1+1-1+1+1 = 3
+    +1+1+1-1+1 = 3
+    +1+1+1+1-1 = 3
+
+*Solution 1*
+
+recursive with memoizatoin, not much to do here, at each element we choose to add + or -, meaning that we add or substract the current element to the target sum. We return the sum of those two ways.
+
+*Solution 2: Bottom-up*
+
+This is more interesting, we can't go from one end to the other cause at some point we need to know the current value + x and the current value - x. That means we should start at 0. We could use a hashmap for indices or an array from 0 to 2 * sum, where sum doesn't exceeed 1000 and we consider sum to be the middle of the array. 
+
+For clarity purposes let's say the array is between 0 and 2000 so we put 1 and the middle  (1000) and we start from there. If the last element is 1, we will have a way to do the -1 from 999 and a way to do 1 from 1001.
+
+We keep a bidimensional array cause the results from the previous index are not valid at the current index.
+
+
+*Solution 3: Subsets*
+
+We can think about the problem, differently. Let's start with an example
+
+    [4, 1, 3, 2]  4
+
+The sum is 6, so we need to find 2 subsets such as the difference between them is 4.
+
+    a + b = 10
+    a - b = 4
+    -----------
+    2 * a = 14, a = 7, b = 3
+    
+So we need to find the numbers of way we can make 5.
+
+This can be reduced at a smaller problem. We can do it recursively, at each point we have the option to use a number or not to use it.
+
+So there will be the following calls
+
+    ways(nums, 0, 7)  
+        ways(nums, 1,  3)  
+            ways(num, 2, 2) 
+                ways(nums, 3, -1)
+                    ways(nums, 4, -3)
+                    ways(nums, 4, -1)
+                ways(nums, 3, 2)  
+                    ways(nums, 4, 0) // used 4, 1, 2
+                    ways(nums, 4, 2)
+            ways(nums, 2, 3)
+                ways(nums, 3, 0) 
+                    ways(nums, 4, -2) 
+                    ways(nums, 4, 0) // used 4, 3
+                ways(nums, 3, 3) 
+                    ways(nums, 4, 1) 
+                    ways(nums, 4, 3) 
+
+        ways(nums, 1,  7)
+            ways(nums, 2, 6)  
+                ways(nums, 3, 3)
+                    ways(nums, 4, 1)
+                    ways(nums, 4, 3)
+                ways(nums, 3, 6) 
+                    ways(nums, 4, 4)
+                    ways(nums, 4, 6)
+            ways(nums, 2,  7)
+                ways(nums, 3, 4)
+                    ways(nums, 4, 2) 
+                    ways(nums, 4, 4) 
+                ways(nums, 3, 7) 
+                    ways(nums, 4, 5) 
+                    ways(nums, 4, 7) 
+
+ Looks like there are 2 ways. Rows is equal to the nums indices and columns are the target. We start with `(0,0) = 1`. Then there is a possibility to make target `1` with the first number, 2 posibilities to make `3` with numbers 1 to 3,
+
+    [4, 1, 3, 2]
+
+      0 1 2 3 4 5 6 7
+    0 1 0 0 0 0 0 0 0
+    4 1 0 0 0 1 0 0 0
+    1 1 1 0 0 1 1 0 0
+    3 1 1 0 1 2 1 0 1 
+    2 1 1 1 2 2 2 2 2
+
+This uses a 2D matrix. 
+
+With a 4 we can make the target 4.
+With a 4 and a 1, we can make the target 1, 4 and 5 
+With 4,1,3, we can make 1, 3, 4 (x2) ,5 and 7
+With 4,1,3,2 we can make 1,2, (3x2), (4x2), (5x2), (6x2), (7x2)
+
+
+We can change it to use a single one, going from the back to front and updating the index at the right with the index to the left which was not processed yet
+
+      0 1 2 3 4 5 6 7
+    0 0 0 0 0 0 0 0 1
+    4 0 0 0 1 0 0 0 1
+    1 0 0 1 1 0 0 1 1
+    3 1 0 1 2 1 0 1 1 
+    2 2 2 2 2 2 1 1 1
