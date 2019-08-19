@@ -445,3 +445,95 @@ We can change it to use a single one, going from the back to front and updating 
     1 0 0 1 1 0 0 1 1
     3 1 0 1 2 1 0 1 1 
     2 2 2 2 2 2 1 1 1
+
+
+### 309. Best Time to Buy and Sell Stock with Cooldown
+
+Say you have an array for which the ith element is the price of a given stock on day i.
+
+Design an algorithm to find the maximum profit. You may complete as many transactions as you like (ie, buy one and sell one share of the stock multiple times) with the following restrictions:
+
+* You may not engage in multiple transactions at the same time (ie, you must sell the stock before you buy again).
+ * After you sell your stock, you cannot buy stock on next day. (ie, cooldown 1 day)
+
+Example:
+
+    Input: [1,2,3,0,2]
+    Output: 3 
+    Explanation: transactions = [buy, sell, cooldown, buy, sell]
+
+*Solution 1: Top Down*
+
+At each point we have three options, buy, sell or wait.
+
+The restrictions are: we can't sell without a buy, we can't buy after a sell. So we can pass 2 parameters hasSold and hasBought.
+
+If we have just sold we must wait
+If we bought, we can sell or wait.
+If we neither just sold nor bought, we can wait or we can buy.
+
+
+If we sell at a point, we return all the profit made so far + nums[i] 
+
+If we buy at a point we return the profit made so far - nums[i]. 
+
+If we wait, we don't do nothing. 
+
+If we want to cache, we can't just use the index, we must use index + hasBought + hasJustSold.
+
+
+Alternative: 
+Another approach would be to send the information from the bottom up and construct the result. Although this has better performance, it complicates the problem a little bit cause we have to keep track of an additional variable:
+
+```java
+
+    static class Result {
+        int sold;
+        int buy;
+        int waitWithStock;
+        int waitWithoutStock;
+    }
+
+```
+
+The logic itself is more complicated
+
+```java
+
+    private Result profit(int[] prices, int i) {
+
+        if (i == prices.length) {
+            return new Result();
+        }
+
+        Result next = profit(prices, i + 1);
+
+        Result result = new Result();
+
+        result.sold = Math.max(next.waitWithoutStock + prices[i], next.sold);
+        result.buy = Math.max(next.waitWithoutStock, Math.max(next.buy, next.sold)) - prices[i];
+        result.waitWithStock = Math.max(next.waitWithStock, next.sold);
+        result.waitWithoutStock = Math.max(next.waitWithoutStock, next.buy);
+
+        return result;
+    }
+```
+
+
+* Solution 3*
+
+Let's try a bottom up approach using the first alternative.
+
+We initialize a two dimensional array, for buy and sell. This array represents the biggest profit in any of the 2 situations, with and without stock. Bought holds the money when we have stock, sold money without stock. We compute each one using another, and at the end we will look at length of sell.
+
+    [1,2,3,0,2]
+
+At the first position. We can only buy. Second position we can either buy, sell or wait. If we wait things don't change. 
+
+ `bought[i] = Math.max(bought[i-1], sold[i-2] - price[i])`
+
+ `sold[i] = Math.max(sold[i-1], bought[i-1] + price[i])`
+
+             1  2  3  0  2
+    bought: -1 -1 -1  2  0
+    sold:    0  1  2  2  4
