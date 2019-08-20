@@ -537,3 +537,31 @@ At the first position. We can only buy. Second position we can either buy, sell 
              1  2  3  0  2
     bought: -1 -1 -1  1  1
     sold:    0  1  2  2  3
+
+
+
+### 300. Longest Increasing Subsequence
+Given an unsorted array of integers, find the length of longest increasing subsequence.
+
+    Input: [10,9,2,5,3,7,101,18]
+    Output: 4 
+Explanation: The longest increasing subsequence is [2,3,7,101], therefore the length is 4. 
+
+*Solution 1 Recursivity, top-down* 
+
+We can try a recursive solution, for each element we have the option of using it (provided it is bigger than the previous) or not. The problem is that we don't use it we need to pass forward the previous element that we used, kind of cumbersome. When we cache we cache the element and the previous. This is more difficult to do if you want to reverse it in a bottom-up approach.
+
+*Solution 2 Recursivity, top-down* 
+
+Usually in this kind of problems, increasing sequences we should try starting from the end, that way we don't need to pass the extra parameter.
+
+So at the last element we iterate through all the previous elements. If the previous element is smaller then the current element we add 1 to its maximum, otherwise we just copy it.
+
+*Solution 3 - Bottom up* 
+
+The previous solution is easier to turn around in a bottom-up approach. We just keep a unidimensional array and we compute the maximums of the previous elements + 1  if appropriate.
+
+    [ 10,  9,  2,  5,  3,  7,101, 18]
+    [  1,  1,  1,  2,  2,  3,  4,  4]
+
+
