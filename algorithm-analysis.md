@@ -241,73 +241,6 @@ How many possible unique paths are there?
 *Solution*
 We can do the problem recursive, at each position he has the option to go right or down. We can stop whenever bottom and right or out of bounds and we can also cache the results. We have to make sure we get the index right if the grid is `m x n` we have to stop at `m-1, n-1`.
 
-* ### Minimum Path Sum
-
-Given a m x n grid filled with non-negative numbers, find a path from top left to bottom right which minimizes the sum of all numbers along its path.
-
-*Solution*
-
-This is similar to the previous one, we just need to keep track of the sum and abandon once we have reached a bigger sum.
-
-The problem arises if we want to cache the results. What can we cache at each `(row, column)` ?
-
-It should be the minimum distance to the end point. So for example for the following matrix:
-
-    [1, 3, 1],
-    [1, 5, 1],
-    [4, 2, 1]
-
-at each position we should cache the min distance to the end. The cache matrix should look like this:
-
-    [7, 6, 3]
-    [8, 7, 2]
-    [7, 3, 1]
-
-So at `grid(2,2)` the sum is `1`. At `grid(2,1)` the min sum is `3`.
-
-
-
-Actually if we want to cache it, the code is pretty complicated.
-
-```java 
-
-   private int minPathSum(int[][] grid, int row, int column, int sum, Integer[][] cache) {
-
-        if (row == grid.length || column == grid[0].length) {
-            return Integer.MAX_VALUE;
-        }
-
-        if (cache[row][column] != null) {
-            return sum + cache[row][column];
-        }
-
-        sum += grid[row][column];
-
-        if (row == grid.length -1 && column == grid[0].length -1) {
-            cache[row][column] = grid[row][column];
-            return sum;
-        } else {
-
-            int min = Math.min(minPathSum(grid, row + 1, column, sum, cache), minPathSum(grid, row, column + 1, sum, cache));
-
-            cache[row][column] = min - sum + grid[row][column];
-
-            return min;
-        }
-
-    }
-
-```
-This is one of the situation where the bottom-up solution would be more easier.
-
-*Solution 2*
-
-We start with the end and another matrix for computing the paths. 
-We copy the bottom right position, and for each previous position we have a choice, we user the the min between the left path and the right path plus the value at that position.
-
-Note: I was tempted to use a bigger cache so I don't have to handle the borders (`row+1, col + 1`) but I got into troubles. So it's probably better to do it.
-
-tags: #recursive. #bottom-up
 
 * ### Sort Colors
 
@@ -445,4 +378,33 @@ So at that point we could cache `1` with `1` move and `10` with `2` moves
             8 -> 1       // 8 -> 5 squares    
                 7 -> 1   // 7 in 4 squares
                     6 -> // we have it in cache. We return 3 
+
+
+
+## 378. Kth Smallest Element in a Sorted Matrix
+
+Given a n x n matrix where each of the rows and columns are sorted in ascending order, find the kth smallest element in the matrix.
+
+Note that it is the kth smallest element in the sorted order, not the kth distinct element.
+
+Example:
+
+    [ 1,  5,  9],
+    [10, 11, 13],
+    [12, 13, 15]
+
+    k = 8,
+
+    return 13.
+
+
+*Solution 1 (merge arrays)*
+
+We can look at this problem as a set of sorted arrays. We can simulate a merge , (using a priority queue?), taking the smallest element each time and counting them. Once we reach K, we return.
+
+*Solution 2 (binary search + caterpillar)*
+
+We know how to search a element in O(N), we just don't know what the element is. So we can try to guess it using binary search (it might be or not in the matrix) and then count how many elements are smaller or equal with it. If the count is too small we use binary search to find the next number.
+
+There is one tricky part, when doing binary search if we get the exact count this doesn't necessarily mean that we found the result. It could be a number that we made up which we know that is a number bigger than n elements which fits our requirement. But it could be other, so we mark it as a candidate and we try a smaller one.
 

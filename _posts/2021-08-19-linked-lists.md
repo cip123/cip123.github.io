@@ -84,3 +84,11 @@ We can look at this as a linked list:
 
 So we can do the same Floyd's tortoise and hare scheme.
 
+## 148. Sort List
+
+Sort a linked list in O(n log n) time using constant space complexity.
+
+*Solution*
+
+The best fit for this kind of sort is merge sort. We only have to be careful about how we are treating the list segments when we split the list in tow. The most elegant way to do it is to break the connection betweeen nodes. The alternative would be to keep to pass along the left and the right length to the merge function.
+
