@@ -408,3 +408,77 @@ We know how to search a element in O(N), we just don't know what the element is.
 
 There is one tricky part, when doing binary search if we get the exact count this doesn't necessarily mean that we found the result. It could be a number that we made up which we know that is a number bigger than n elements which fits our requirement. But it could be other, so we mark it as a candidate and we try a smaller one.
 
+
+341. Flatten Nested List Iterator
+
+Given a nested list of integers, implement an iterator to flatten it.
+
+Each element is either an integer, or a list -- whose elements may also be integers or other lists.
+
+Example 1:
+
+    Input: [[1,1],2,[1,1]]
+    Output: [1,1,2,1,1]
+    Explanation: By calling next repeatedly until hasNext returns false, the order of elements returned by next should be: [1,1,2,1,1].
+
+Example 2:
+
+    Input: [1,[4,[6]]]
+    Output: [1,4,6]
+    Explanation: By calling next repeatedly until hasNext returns false, the order of elements returned by next should be: [1,4,6].
+
+*Solution 1: preprocess and using a queue*
+
+We ignore the fact that this is an iterator and we just compute all the values upfront using a DFS and a queue. If it's an iteger we add it to the stack, else we add all it's field to the stack recursively.
+
+```java
+    private void addToQueue(NestedInteger nestedInteger, Queue queue) {
+        
+        
+        if (nestedInteger.isInteger()) {
+            queue.add(nestedInteger.getInteger());
+        } else {
+            
+            for (NestedInteger child : nestedInteger.getList()) {
+                addToQueue(child, queue);
+            }
+            
+        }
+        
+    }
+```
+
+*Solution 2: (real iterator)*
+
+In order to implement a real iterator, we wouldn't need to copy the structure but to keep a iterator to the nested list.
+
+This is the covariants.
+
+* If the current element is of type integer, it is straight forward. The child iterator is null and we have a next.
+* If the current element is of type list, we have a child iterator and we have a next if the list is not empty or there are other elements in the previous list. 
+
+Ideally we would like all this covariants setup at every time so whenever we call hasNext and next everything is ready so we can return in O(1).
+The problem appears when the current element is of type list and it is empty and it is not the last element in the array. Cause the hasNext will return true (because there are next elements) and next will throw a error, cause we try to get index 0 of an empty list.
+
+So the best thing to do is to ignore a list which is empty.
+Here is the logic which finds a valid position:
+
+```java
+    private void moveToValidPosition() {
+        
+        while (index < list.size()) {                
+            NestedInteger current = list.get(index);    
+            
+            if (current.isInteger()) break;
+            
+            childIterator = new NestedIterator(current.getList());
+            if (!childIterator.hasNext()) {
+                index++;
+            } else {
+                break;
+            }
+
+        }
+        
+    }
+```    
