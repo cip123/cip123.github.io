@@ -567,49 +567,356 @@ The previous solution is easier to turn around in a bottom-up approach. We just 
     [  1,  1,  1,  2,  2,  3,  4,  4]
 
 
-## 72. Edit Distance
+## 322. Coin Change
 
-Given two words word1 and word2, find the minimum number of operations required to convert word1 to word2.
-
-You have the following 3 operations permitted on a word:
-
-    Insert a character
-    Delete a character
-    Replace a character
+You are given coins of different denominations and a total amount of money amount. Write a function to compute the fewest number of coins that you need to make up that amount. If that amount of money cannot be made up by any combination of the coins, return -1.
 
 Example 1:
 
-    Input: word1 = "horse", word2 = "ros"
-    Output: 3
+    Input: coins = [1, 2, 5], amount = 11
+    Output: 3 
+    Explanation: 11 = 5 + 5 + 1
+
+Example 2:
+
+    Input: coins = [2], amount = 3
+    Output: -1
+
+
+*Solution 1 (recursive: top down)*
+
+At each coin index we have the option of using that coin or not use it.
+
+```java
+
+    private int minCoins(int[] coins, int i, int amount, Integer[][] cache) {
+
+        if (amount == 0) return 0;
+        
+        if (amount < 0 || i == coins.length) {
+            return -1;
+        }
+
+        if (cache[i][amount] != null) {
+            return cache[i][amount];
+        }
+
+        int with = minCoins(coins, i, amount-coins[i], cache);
+
+        if (with  >= 0) {
+            with++;
+        }
+
+        int without = minCoins(coins, i +1, amount, cache);
+
+        int result;
+
+        if (with > 0 && without > 0) {
+            result =  Math.min(with, without);
+        } else if (with < 0) {
+            result = without;
+        } else {
+            result = with;
+        }
+
+        cache[i][amount] = result;
+
+        return result;
+    }
+
+```
+
+This takes 35 ms on leet code, probably because of the strack depth and we use a bidimensional Integer array. There is one trick, we should always consider -1 as an invalid value, so we should not take into cosideration when adding 1.
+
+*Solution 2 (recursive: top-down)*
+
+Another aproach is to avoid passing the coin index at every strack trace, so for each amount we compute all the coin combinations. The algoritm would look like this:
+
+```java
+
+ private int minCoins(int[] coins, int amount, Integer[] cache) {
+
+        if (amount < 0) {
+            return -1;
+        } else if (amount == 0) {
+            return 0;
+        }
+
+        if (cache[amount] != null) return cache[amount];
+
+        int min = Integer.MAX_VALUE;
+
+        for (int coin : coins) {
+            int current = minCoins(coins, amount -coin, cache);
+            if (current != -1) {
+                min = Math.min(min, current+1);
+            }
+        }
+
+        int result = min == Integer.MAX_VALUE ? -1 : min;
+        cache[amount] = result;
+
+
+        return result;
+
+    }
+
+
+```
+
+*Solution 3 (bottom-up for solution 1)*
+
+For every coin index we iterate the amount, computing the minimum coins up to that index that we can use to make that amount.
+
+```java
+    public int coinChange(int[] coins, int amount) {
+        int[] cache = new int[amount+1];
+        Arrays.fill(cache, -1);
+        cache[0] = 0;
+
+        for (int i = 0; i < coins.length; i++) {
+            for (int j = 1; j <= amount; j++) {
+
+                int min = Integer.MAX_VALUE;
+
+                int without = cache[j];
+
+                if (without != -1) {
+                    min = Math.min(without, min);
+                }
+
+                if (coins[i] <= j) {
+
+                    int with = cache[j - coins[i]];
+
+                    if (with != -1) {
+
+                        min = Math.min(with + 1, min) ;
+                    }
+                }
+
+                cache[j] = min == Integer.MAX_VALUE ? -1 :min;
+            }
+
+        }
+        return cache[amount];
+    }
+
+```
+
+*Solution 4 (bottom-up for solution 2)*
+
+The array cache length is the same. For each amount we compute the minimum we can make using all the coins.
+
+```java
+    public int coinChange(int[] coins, int amount) {
+        int[] cache = new int[amount +1];
+        Arrays.fill(cache, -1);
+        cache[0] = 0;
+
+        for (int i = 1; i<= amount; i++) {
+
+            int min = Integer.MAX_VALUE;
+
+            for (int j = 0; j < coins.length; j++) {
+                if (coins[j] <= i) {
+                    if (cache[i-coins[j]] != -1) {
+                        min = Math.min(cache[i - coins[j]] + 1, min);
+                    }
+                }
+            }
+
+            if (min == Integer.MAX_VALUE) {
+                min = -1;
+            }
+
+            if (cache[i] == -1) {
+                cache[i] = min;
+            } else {
+                cache[i] = Math.min(cache[i], min);
+            }
+
+        }
+
+        return cache[amount];    
+    }
+```
+
+Another aproach would be instead of using -1 an an invalid value, to use a large value that could not be obtained (eg. amount + 1). The benefit is that we won't need to check for -1 every time.
+
+```java
+    public int coinChange(int[] coins, int amount) {
+        int[] cache = new int[amount +1];
+        Arrays.fill(cache, amount + 1);
+        cache[0] = 0;
+
+        for (int i = 1; i<= amount; i++) {
+
+            for (int j = 0; j < coins.length; j++) {
+
+                if (coins[j] <= i) {
+                    cache[i] = Math.min(cache[i - coins[j]] + 1, cache[i]);
+                }
+            }
+        }
+
+        return cache[amount] > amount ? -1 : cache[amount];    
+    }
+```
+
+## 31. Palindrome Partitioning
+
+Given a string s, partition s such that every substring of the partition is a palindrome.
+
+Return all possible palindrome partitioning of s.
+
+Example:
+
+    Input: "aab"
+    Output:
+    [
+        ["aa","b"],
+        ["a","a","b"]
+    ]
+
+
+*Solution *
+
+There are two things that I have learned from this algorithm. 
+
+* When we are required to pass along a list of results, we don't need to clone it in order to pass it around for next step. We just add it before the recursive call and we remove it right afterwards. First recursive call goes until the end, then the second one and so one. They don't go in parallel :D
+
+* We can use the bottom up algorithm to compute the palindrome subsequences of a string. Let's take the following string as an example:
+ `a b b a c d`
+
+
+We create a bidimensional matrix, rows meaning the start and columns meaning the end (start can be less than the end).
+
+
+
+      a b b a c d
+    a 1 0 0 1 0 0
+    b   1 1 0 0 0
+    b     1 0 0 0
+    a       1 0 0
+    c         1 0
+    d           1
+
+
+
+For each element and each length we compute if it's a palindromic sequence.
+
+
+* if `l == 1`; `start == end` and the value will aways be a palindrome
+* if `l == 2`, `end = start +1`  and it is a palindrome if `start == end`.
+* if `l > 2` in addition to start being equal to end we need to see that `start+1, end-1` is also a palindrome.
+
+
+
+## 312. Burst Balloons
+
+Given n balloons, indexed from 0 to n-1. Each balloon is painted with a number on it represented by array nums. You are asked to burst all the balloons. If the you burst balloon i you will get nums[left] * nums[i] * nums[right] coins. Here left and right are adjacent indices of i. After the burst, the left and right then becomes adjacent.
+
+Find the maximum coins you can collect by bursting the balloons wisely.
+
+Note:
+
+    You may imagine nums[-1] = nums[n] = 1. They are not real therefore you can not burst them.
+    0 ≤ n ≤ 500, 0 ≤ nums[i] ≤ 100
+
+Example:
+
+    Input: [3,1,5,8]
+    Output: 167 
+
 Explanation: 
-
-    horse -> rorse (replace 'h' with 'r')
-    rorse -> rose (remove 'r')
-    rose -> ros (remove 'e')
-
-*Solution* 
-
-Looks like there is a pattern here, instead of blindly trying all the combinations we can build up from the previous ones.
-
-We can try with the smallest words to see how it works:
-
-    h - '' -> 0
-    r - '' -> 0    
-    h - r -> 1
-    ho - r -> 1
-    ho - ro -> 1
-    ro - h -> 1
-
-Let's try `hor, ro` now. 
-
-We have three options:
-
-* take the result for `ho, r` and add a change since the last letters are different, if it would have ended in the same letters we wouln't need to do it. I
-* take the result of `hor, r` and add a change, since we are adding `o` to `r`.  
-* take the result of `ho, ro` and add a change, since we are adding `r` to `ho`.
+    
+    nums = [3,1,5,8] --> [3,5,8] -->   [3,8]   -->  [8]  --> []
+             coins =  3*1*5      +  3*5*8    +  1*3*8      + 1*8*1   = 167
 
 
-For this kind of question it looks easier to build the bottom up approach instead of the top down, especially cause we need to start it at index 1 instead of index 0.
+*Solution 1 (first try)*
+
+I tried the recurive variant where I used an array list and as the problem explained I removed an element from it and pass the array later on. I got a time limit exceeded.
+
+The problem with this approach is that I could not cache anything. 
+Looking at the example `[3, 1, 5, 8]`  we realize that we could cache the maximum profit we can make before two indices, `left` and `right`.  So we can start with the smallest difference between indices, which is 2 and build from there. 
+
+
+I tried to use a approach where once i check an index I set it to -1 in the array and then iterate through the rest to find a valid pair but this is not the right approach. It is better to use divide and conquer.
+
+
+Here is an example for the following baloons:
+
+    0 1 2 3 4 5
+    -----------
+    1 3 1 5 8 1
+
+
+We start with `left=0, right = 5`. We add for example `i=4`. So the problem becomes `left=0, right=4` + `left=4, right=5 + baloons[left] + baloons[right] + baloons[i]`.
+
+We can buld a top-down and bottom up approch, just be careful at the bottom up approach we have to start with the minimum distance between left and right, which is 2 ( and start from there).
+
+
+
+
+## 140. Word Break II
+
+Given a non-empty string s and a dictionary wordDict containing a list of non-empty words, add spaces in s to construct a sentence where each word is a valid dictionary word. Return all such possible sentences.
+
+Note:
+
+    The same word in the dictionary may be reused multiple times in the segmentation.
+    You may assume the dictionary does not contain duplicate words.
+
+Example 1:
+
+Input: 
+    
+    s = "catsanddog"
+
+    wordDict = ["cat", "cats", "and", "sand", "dog"]
+
+Output:
+    [
+    "cats and dog",
+    "cat sand dog"
+    ]
+
+*Solution 1*
+
+I have tried a trie approach where I iterate one by one and check if at the current index we have a valid word and if so I reset the trie.
+ 
+ *Solution 2*
+
+
+This is unnecessary though, because a trie is used when we need to search a character in multiple words. For this case we can just iterate from start to end and see if the current word is in the dictionary. If it is we do the recursive call with the end index at the start index.
+
+
+## 44. Wildcard Matching
+
+Given an input string (s) and a pattern (p), implement wildcard pattern matching with support for '?' and '*'.
+
+'?' Matches any single character.
+'*' Matches any sequence of characters (including the empty sequence).
+
+*Solution*
+
+The tricky thing here is that when the string is empty the pattern can only consist of `*` characters.
+
+Other than that the problem can be solved recursively using top down or bottom up.
+
+
+For a regular digit or the '?' sign the problem is straight forward. For the `*` sign though, 
+we have to look at several previous solutions: we have the option of not using it and then we just advance the pattern index, or the option of using it, advancing the string index and the pattern index.
+
+
+
+
+
+
+
+
 
 
 

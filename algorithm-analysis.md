@@ -698,13 +698,17 @@ So we can try another approach, sort the array and then modify it using one of t
 
 The problem with both the above approaches is that they either end in the same place, (first approach) or as the string is small the firt one ends just after the the second one starts. 
 
-A valid response would be `5, 6, 4, 5`, so we start from the mid and end and we make sure we have a smaller item between them
+A valid response would be `5, 6, 4, 5`, so we start from the mid and end and that we make sure we have a smaller item between them
 
 *Note* this is diferrent then wiggle sort where the elements could have been equal where we could greedly correct the location in at each point.
 
 *Solution 2 O(n)* 
 
-We could try to use selection rank algorithm until we find a mid such as all the elements before mid are smaller than him and all the elements after mid are greater or equal and then we intertwine them
+We could try to use selection rank algorithm until we find a mid such as all the elements before mid are smaller than him and all the elements after mid are greater or equal and then we intertwine them. Actually the solutions is pretty complicated, a guy wrote an entire essay about wiggle sort which can be found here.
+
+https://leetcode.com/problems/wiggle-sort-ii/discuss/77684/Summary-of-the-various-solutions-to-Wiggle-Sort-for-your-reference
+
+The key thing here is that we have to use map indexing or virtual indexing for this and this it out of scope for this preparation.
 
 
 
