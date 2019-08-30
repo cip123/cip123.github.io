@@ -666,7 +666,45 @@ We can arrange them in anyway, but we will find a way to traverse them:
     -3, 1, -4, -5 11.
 
 
+## 324. Wiggle Sort II
 
+
+Given an unsorted array nums, reorder it such that nums[0] < nums[1] > nums[2] < nums[3]....
+
+Example 1:
+
+    Input: nums = [1, 5, 1, 1, 6, 4]
+    Output: One possible answer is [1, 4, 1, 5, 1, 6].
+
+Example 2:
+
+    Input: nums = [1, 3, 2, 2, 3, 1]
+    Output: One possible answer is [2, 3, 1, 3, 1, 2].
+
+
+*Solution 1*
+
+We try a greed algorithm at each position we calculate the best outcome for that position using the neighbours.
+
+Unfortunately this does not work with long string of equal values. Eg
+
+    1 1 1 1 2 3 4 5
+
+So we can try another approach, sort the array and then modify it using one of those approaches.
+
+* take a element from the start and then an element from the end. This will fail for `4,5,5,6`, it will result in `4,6,5,5` which does not work.
+* take an element from the start and a element from the mid. It still will not work because `4, 5, 5, 6` will result in `4, 5, 5, 6` which is still not valid.
+
+
+The problem with both the above approaches is that they either end in the same place, (first approach) or as the string is small the firt one ends just after the the second one starts. 
+
+A valid response would be `5, 6, 4, 5`, so we start from the mid and end and we make sure we have a smaller item between them
+
+*Note* this is diferrent then wiggle sort where the elements could have been equal where we could greedly correct the location in at each point.
+
+*Solution 2 O(n)* 
+
+We could try to use selection rank algorithm until we find a mid such as all the elements before mid are smaller than him and all the elements after mid are greater or equal and then we intertwine them
 
 
 
