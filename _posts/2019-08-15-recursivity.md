@@ -547,6 +547,8 @@ Given an unsorted array of integers, find the length of longest increasing subse
     Output: 4 
 Explanation: The longest increasing subsequence is [2,3,7,101], therefore the length is 4. 
 
+*Note* I fell twice in trap of thinking I can do it in O(n), using a greedy algorithm, taking the max element so far and finding the minimum ones.
+
 *Solution 1 Recursivity, top-down* 
 
 We can try a recursive solution, for each element we have the option of using it (provided it is bigger than the previous) or not. The problem is that we don't use it we need to pass forward the previous element that we used, kind of cumbersome. When we cache we cache the element and the previous. This is more difficult to do if you want to reverse it in a bottom-up approach.

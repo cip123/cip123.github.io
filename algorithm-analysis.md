@@ -482,3 +482,224 @@ Here is the logic which finds a valid position:
         
     }
 ```    
+
+## 334. Increasing Triplet Subsequence
+
+
+Given an unsorted array return whether an increasing subsequence of length 3 exists or not in the array.
+
+Formally the function should:
+
+Return true if there exists `i, j, k` such that `arr[i] < arr[j] < arr[k]` given `0 ≤ i < j < k ≤ n-1` else return false.
+
+Note: Your algorithm should run in `O(n)` time complexity and O(1) space complexity.
+
+*Solution*
+
+
+At each iteration we will keep track of the minimum 2 values seen so far. The mid variable denotes the end of the smallest subsequence seen so far.
+
+For example.
+[5,6,5,1,2,4]
+
+
+* i = 0, low = 5, mid = Integer.MAX_VALUE;
+* i = 1, low = 5, mid = 6;
+* i = 2, low = 5, mid = 6;
+* i = 3, low = 1, mid = 6;
+
+Now this is the bit where it seems counterintuitive. The low and mid doesn't seem to be consistent since the mid is before the low in the original array. But the fact that mid is 6 means that if we see something bigger than 6 we return. 
+* i = 4, low = 1, mid = 2;
+* i = 5, low = 1, mid = 2; high == 4, return
+
+
+## 395. Longest Substring with At Least K Repeating Characters
+
+Find the length of the longest substring T of a given string (consists of lowercase letters only) such that every character in T appears no less than k times.
+
+Example 1:
+
+    Input:
+    s = "aaabb", k = 3
+
+    Output:
+    3
+
+The longest substring is "aaa", as 'a' is repeated 3 times.
+
+Example 2:
+
+    Input:
+    s = "ababbc", k = 2
+
+    Output:
+    5
+
+The longest substring is "ababb", as 'a' is repeated 2 times and 'b' is repeated 3 times.
+
+
+*Solution 1*
+
+I tried the brute force solution, for each index, `i` and `j`, computed the frequencies and checked if the substring is valid. 
+Didn't pass.
+
+
+*Solution 2*
+
+    "aaacbb"
+
+We can check each character assuming that the string is ending at each char.
+
+* 0, a = 1, can be a solution so we go forward
+* 1, a = 2, can be a solution so we go forward
+* 2, a = 3, we have a result
+* 3, a = 3, b = 1, b is not a candidate so we reset the start to end + 1.
+
+Case 2:
+    
+    "ababbc"
+    freqs = {a=2,b=3,c=1}, min = 2
+
+
+* 0, a, a = 1, can be a solution so we go forward, min = 1
+* 1, b = 1, can be a solution so we go forward
+* 2, a = 2, b = 1 can be a solution so we go forwarrd
+* 3, a = 2, b = 2, it is a solution, we go forward
+* 4, a = 2, b = 3, it is a solution, 
+* 5, c is not a solution
+
+Case 3:
+
+    "bbaaacbd"
+    freqs = {a=3,b=3,c=1, d=1}, min = 3
+
+* 0, b, b=1 can be a solution
+* 1, b, b=2 can be a solution
+* 2, a, b=2, a=1 can be a solution
+* 3, a, b=2, a=2 can be a solution
+* 4, a, b=2, a=3, it is a solution, we just need to get rid of extra `b` from the beginning. We remove from the start window until the string is valid. 
+
+We use two helper functions: 
+
+```java
+    boolean hasValidResults(int[] freqs, int k) {
+        
+        for (int n : freqs) {
+            if (n >= k) {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+    
+    boolean isValid(int[] freqs, int k) {
+        
+        int min = Integer.MAX_VALUE;;
+        
+        for (int n : freqs) {
+            if (n != 0) {
+                if (n < k) return false;
+            }
+        }
+        
+        return true;
+        
+    }
+```
+
+That can pass but it takes 2ms when it is a little optimized.
+We lose a lot of time when we are shrinking the window, it would be nice to see in one bit if shrinking the window fixed the validation.
+
+We can track the number of characters that have k count and the number of unique characters. kCount and uCount. if Kcount == uQcount we have a valid result else is valid.
+
+Update, it take the same.
+
+
+TODO: recursive approach
+
+## 134. Gas Station
+
+There are N gas stations along a circular route, where the amount of gas at station i is gas[i].
+
+You have a car with an unlimited gas tank and it costs cost[i] of gas to travel from station i to its next station (i+1). You begin the journey with an empty tank at one of the gas stations.
+
+Return the starting gas station's index if you can travel around the circuit once in the clockwise direction, otherwise return -1.
+
+**Note:**
+
+If there exists a solution, it is guaranteed to be unique.
+Both input arrays are non-empty and have the same length.
+Each element in the input arrays is a non-negative integer.
+
+Example 1:
+
+Input: 
+
+    gas  = [1,2,3,4,5]
+    cost = [3,4,5,1,2]
+
+Output: 3
+
+*Solution 1*
+
+First one is the obvious, we travel through each stations and we compute the tank and if it's possible to get to the next one until we do a full trip. Complexity is O(N^2).
+
+*Solution 2*
+
+This seems to be the same pattern with the celebrity one. to do in We try to do it in linear time and we aim not to find the solution but to eliminate all the other candidates.
+
+
+How can we do that ? We assume that the starting gas stations is zero and at each round we check if the tank is smaller than 0. If it is the startingIndex is not a solution so we set the starting index to be the next gas station. 
+
+* What if we missed a candidate on the road ? For example we started at zero and we noticed that tank is negative at 2, could 1 be a solution ? No, 1 starts with leftover tank from 0 so it has at least as much gas as it would have it starting from 1.
+
+So know we know that all the other elements before startingIndex are not candidates. How do we check that startingIndex is the solution. We know that we can reach from startingIndex to the end, how do we know that we can reach from 0 to the starting index ?
+
+We check the total gas, if total gas is positive, does it mean that we can get from a round trip from a point. What does it mean to not be able to go to a roundtrip from any point. It means that there is a point on that road where totalGas is smaller than the totalCost. On the other hand if the end totalGas is greater or equal to totalCost, there should also be a gas station which compensates for all negative numbers, and then if we start at that gas station we are set. 
+
+What if there are 3 negative and 2 positive, -3, -4, -5 and 1, 11. 
+
+We can arrange them in anyway, but we will find a way to traverse them:
+
+    -3, -4, -5, 1, 11. 
+    -3, 1, -4, -5 11.
+
+
+
+
+
+
+
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
