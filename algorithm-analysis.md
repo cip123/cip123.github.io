@@ -710,6 +710,53 @@ We could try to use selection rank algorithm until we find a mid such as all the
 
 
 
+## 239. Sliding Window Maximum
+
+Given an array nums, there is a sliding window of size k which is moving from the very left of the array to the very right. You can only see the k numbers in the window. Each time the sliding window moves right by one position. Return the max sliding window.
+
+Example:
+
+    Input: nums = [1,3,-1,-3,5,3,6,7], and k = 3
+    Output: [3,3,5,5,6,7] 
+
+
+*Solution 1*
+
+We can start with the quadratic solution, it means that for every index, we go back `k` elements and find the maximum.
+
+How can we optimize this ? 
+
+
+At each iteration we could remove the elements which are smaller then the last element added. So that way the first element will always be the maximum.
+
+
+There are two ways of doing it, start from the head or start from the tail. If we start from the head, we might have elements unsorted elements to the end of the queue, because we are adding elements from the right and prune them from the head. We should return elements from the same side that we added them.
+
+This reduces to a stack problem where we pop elements from the end if the current element is bigger then them. 
+
+At the same time we need to access the head for removing it if it is out of the sliding window, or returning when we need to find the maximum in real time.
+
+
+
+Example:
+
+    [1,3,1,2,0,5]
+    3
+
+
+* `0`, deque = [1]
+* `1`, deque = [3,1]
+* `2`, deque = [3,2]
+* `3`, deque = [5]
+
+
+One additional thing is that, because we have to remove indices from the start of the queue sometimes, we better keep indices in the queue instead of numbers, so we can see whenit's time for an index to go away.
+
+
+*Solution 2*
+
+We use two precalculated array left and right, where for each position i we know the maximum from the start of the block to i, and the max from the end of the block to i. So for each interval `i, j` we will know the exact maximum, if it is in the same block or in different blocks.
+
 
 
     

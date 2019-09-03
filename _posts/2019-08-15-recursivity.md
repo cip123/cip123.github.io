@@ -567,3 +567,49 @@ The previous solution is easier to turn around in a bottom-up approach. We just 
     [  1,  1,  1,  2,  2,  3,  4,  4]
 
 
+## 72. Edit Distance
+
+Given two words word1 and word2, find the minimum number of operations required to convert word1 to word2.
+
+You have the following 3 operations permitted on a word:
+
+    Insert a character
+    Delete a character
+    Replace a character
+
+Example 1:
+
+    Input: word1 = "horse", word2 = "ros"
+    Output: 3
+Explanation: 
+
+    horse -> rorse (replace 'h' with 'r')
+    rorse -> rose (remove 'r')
+    rose -> ros (remove 'e')
+
+*Solution* 
+
+Looks like there is a pattern here, instead of blindly trying all the combinations we can build up from the previous ones.
+
+We can try with the smallest words to see how it works:
+
+    h - '' -> 0
+    r - '' -> 0    
+    h - r -> 1
+    ho - r -> 1
+    ho - ro -> 1
+    ro - h -> 1
+
+Let's try `hor, ro` now. 
+
+We have three options:
+
+* take the result for `ho, r` and add a change since the last letters are different, if it would have ended in the same letters we wouln't need to do it. I
+* take the result of `hor, r` and add a change, since we are adding `o` to `r`.  
+* take the result of `ho, ro` and add a change, since we are adding `r` to `ho`.
+
+
+For this kind of question it looks easier to build the bottom up approach instead of the top down, especially cause we need to start it at index 1 instead of index 0.
+
+
+
