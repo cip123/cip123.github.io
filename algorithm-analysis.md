@@ -758,20 +758,63 @@ One additional thing is that, because we have to remove indices from the start o
 We use two precalculated array left and right, where for each position i we know the maximum from the start of the block to i, and the max from the end of the block to i. So for each interval `i, j` we will know the exact maximum, if it is in the same block or in different blocks.
 
 
+## 308. Range Sum Query 2D - Mutable
+Hard
 
-    
-
-
-
-
+Given a 2D matrix matrix, find the sum of the elements inside the rectangle defined by its upper left corner (row1, col1) and lower right corner (row2, col2).
 
 
+Example:
 
 
+    [3, 0, 1, 4, 2],
+    [5, 6, 3, 2, 1],
+    [1, 2, 0, 1, 5],
+    [4, 1, 0, 1, 7],
+    [1, 0, 3, 0, 5]
+
+    sumRegion(2, 1, 4, 3) -> 8
+    update(3, 2, 2)
+    sumRegion(2, 1, 4, 3) -> 10
+
+*Solution*
+
+We can compute a prefix sum in order to get the response faster. There are two ways to do it:
+
+* per matrix, meaning that for each submatrix we compute it's prefix sum and the query is O(1);. The down side is that the update cost O(n<super>2</super>)
+* per row, we compute the row's sum and the query is (O(n)). The update is also O(n).
+
+Since the first method involves more complex calculations, and the updates happen as frequently as queries it is better to go with the second alternative.
+
+**Note** another alternative is to use Binary Index Trees that were created with this aspect in mind.
 
 
+## 84. Largest Rectangle in Histogram
 
+Given n non-negative integers representing the histogram's bar height where the width of each bar is 1, find the area of largest rectangle in the histogram.
 
+ 
+*Solution 1*
+
+a N^2 solution where I just iterate through each interval and for each start I find the minimum at each end and I calculcate the distance to each end.
+
+*Solution 2* 
+
+We can use a stack, we go from right to left and we only keep the minimums into the stack. The logic is that any elements after the minimum cannot be used. We use the indices in order to compute the area.
+
+We navigate backwards and whenever we get an element greater than the current element, we pop it. At each index we have in the stack the indices to the elements smaller than it. We can easily calculate the distance to the next element bigger than it, by computing the next missing index from the stack but if we want to calculacte the distance to all remaining indices we can do it in N^2.
+
+We can try another approach, we go right keeping elements in increasing order, the max being at the top of the stack. Whenever we see a decreasing element we pop all the elements smaller then him, computing the area till the beginning. 
+
+How do we compute the area ? 
+
+    [6, 7, 5, 2, 4, 5, 9, 3]
+
+* we add `0(6)` to the stack
+* we add `1(7)` to the stack
+
+ * `2(5)` we pop `0(7)` and we compute the area `7 (7 * (2 - 1 - 0))` and we pop `1(6)` we have `12 (5 * (2 - 1 - -1))`. We add `2(5)` to the stack. 
+ * `3(2)`, we pop `2(5)` and we add the area formed with it. We just need to find the next element smaller than it, which is none `-1`, so the area is `15 (5 * (2 - -1))`
 
 
 
